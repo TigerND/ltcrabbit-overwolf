@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Array>
+  <AddInDefinitions>
+    <BaseURL>index.html</BaseURL>
+    <WindowAllowResize>True</WindowAllowResize>
+    <WindowInitialHeight>330</WindowInitialHeight>
+    <WindowInitialWidth>210</WindowInitialWidth>
+    <WindowMaxHeight>1080</WindowMaxHeight>
+    <WindowMaxWidth>1920</WindowMaxWidth>
+    <WindowMinHeight>190</WindowMinHeight>
+    <WindowMinWidth>160</WindowMinWidth>
+    <WindowTitle>LTCRabbit</WindowTitle>
+    <WidgetTitle>LTCRabbit Monitor</WidgetTitle>
+  </AddInDefinitions>
+</Array>

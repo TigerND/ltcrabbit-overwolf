@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head> 
+      <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+      <title>Overwolf Simulation Console - OSC</title>
+	  <link rel="stylesheet" href="StyleOSC.css" />
+  </head>
+  <body>    
+   <script type="text/javascript" language="JavaScript">
+
+       var simulatorWindowOpened = true;
+       var OverwolfAPI = window.opener.OverwolfAPI;
+
+       function onGameChange() {
+           OverwolfAPI = window.opener.OverwolfAPI;
+
+           var isGameRunning = document.getElementById("isGameRunning").checked;
+           var GameTitle = "";
+           var GameId = "";
+           if (isGameRunning) {
+               GameTitle = document.getElementById("GameTitle").value;
+               if (GameTitle == "") {
+                   GameTitle = document.getElementById("GameTitle").value = "World of Warcraft";
+               }
+               GameId = document.getElementById("GameId").value;
+               if (GameId == "") {
+                   GameId = document.getElementById("GameId").value = "765";
+               }
+           }
+           else {
+               document.getElementById("isGameOverlayed").checked = false;
+           }
+           var isGameOverlayed = document.getElementById("isGameOverlayed").checked;
+           OverwolfAPI.SetGameInfo(isGameOverlayed, isGameRunning, GameTitle, GameId);
+       }
+
+
+       function onGameResChange() {
+           OverwolfAPI = window.opener.OverwolfAPI;
+
+           var GameResolutionX = document.getElementById("GameResolutionX").value;
+           var GameResolutionY = document.getElementById("GameResolutionY").value;
+           OverwolfAPI.SetGameResolution(GameResolutionX, GameResolutionY);
+       }
+
+       function onScreenshotDataChanged() {
+           OverwolfAPI = window.opener.OverwolfAPI;
+
+           var ScreenshotUrl = document.getElementById("ScreenshotUrl").value;
+           if (ScreenshotUrl == "") {
+               ScreenshotUrl = document.getElementById("ScreenshotUrl").value = ("http://www.overwolf.com/Pictures/MusicPlayer_02.jpg");
+           }
+           var ScreenshotSucceded = (document.getElementById("ScreenshotSucceded").checked);
+           OverwolfAPI.SetScreenshotInfo(ScreenshotUrl, ScreenshotSucceded);
+       }
+
+       var OverwolfAPI = window.opener.OverwolfAPI;
+
+       function attachToParent() {
+           OverwolfAPI = window.opener.OverwolfAPI;
+           onGameChange();
+           onGameResChange();
+           onScreenshotDataChanged();
+       }
+
+  </script>
+    <form name="OverwolfDebugForm">
+        <h1>Overwolf Debug Console</h1>
+        <h3>Games information:</h3>
+        
+        <div class="OWlabel">
+            <label for="isGameOverlayed" title="isGameOverlayed">isGameOverlayed</label>
+        </div>
+        <div class="OWInput">
+            <input type="checkbox" name="isGameOverlayed" id="isGameOverlayed" onchange="onGameChange();"/>
+        </div>
+        <br class="clear"/>
+        <div class="OWlabel">
+            <label for="isGameRunning" title="isGameRunning">isGameRunning</label>
+        </div>
+        <div class="OWInput">
+            <input type="checkbox" name="isGameRunning" id="isGameRunning" onchange="onGameChange();"/>
+        </div>
+        <br class="clear"/>
+        <div class="OWlabel">
+            <label for="GameTitle" title="Running Game Title">Running Game Title</label>
+        </div>
+        <div class="OWInput">
+            <input type="text" name="GameTitle" value="" size="60" id="GameTitle" onchange="onGameChange();"/>
+        </div>
+        <br class="clear"/>
+        <div class="OWlabel">
+            <label for="GameId" title="Running Game Id">Running Game Id</label>
+        </div>
+        <div class="OWInput">
+            <input type="text" name="GameId" value="" size="17" id="GameId" onchange="onGameChange();"/>
+        </div>
+        <br class="clear"/>
+        <div class="OWlabel">
+            <label for="GameResolution" title="Game Resolution">Game Resolution</label>
+        </div>
+        <div class="OWInput">
+            <input type="text" name="GameResolutionX" size=5 value="" id="GameResolutionX" onchange="onGameResChange();"/> x <input size=5 type="text" name="GameResolutionY" value="" onchange="onGameResChange();" id="GameResolutionY"/>
+        </div>
+        <br class="clear"/>
+        <hr />
+        <h3>Screenshots:</h3>
+        <div class="OWlabel">
+            <label for="ScreenshotUrl" title="Screenshot Url">Screenshot Url</label>
+        </div>
+        <div class="OWInput">
+            <input type="text" name="ScreenshotUrl" size=60 value="" id="ScreenshotUrl" onchange="onScreenshotDataChanged();"/>
+        </div> 
+        <br class="clear"/>
+        <div class="OWlabel">
+            <label for="ScreenshotSucceded" title="ScreenshotSucceded">Screenshot Succeded</label>
+        </div>
+        <div class="OWInput">
+            <input type="checkbox" name="ScreenshotSucceded" id="ScreenshotSucceded" onchange="onScreenshotDataChanged();"/>
+        </div>
+        <br class="clear"/>
+     </form>
+  </body>
+</html>

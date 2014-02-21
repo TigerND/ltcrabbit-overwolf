@@ -1,0 +1,17 @@
+
+Nickname: Tiger
+Real name: Alexander Zykov
+Email: tigernwh@gmail.com
+Version: 1.0.0
+Category: Utilities
+Tags: LTCRabbit Bitcoin Litecoin BTC LTC Mining Pool
+
+The following (sexy) images:
+1. IconMouseNormal.png - a gray-scale icon for the round app button - default state (256×256, will be resized to 37×37).
+2. IconMouseOver.png - a colored icon for the round app button - mouse-over state (256×256, will be resized to 37×37).
+3. SmallAppstoreTile.png - a small Appstore tile introducing your app (192×160).
+4. LargeAppstoreTile.png - a large Appstore tile introducing your app (404×160).
+5. SmallAppIcon.png - a small icon representing the app in the "my apps" page (70×70).
+6. LargeAppIcon.png - a large icon representing the app in the single app page (90×90).
+
+This application is meant to monitor LTCRabbit mining pool workers using public API
