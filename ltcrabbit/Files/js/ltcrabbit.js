@@ -27,6 +27,8 @@ ltcrabbit.eval = function(action, apikey, id, cb, eb)
 		}).fail(function(){
 		    eb()
 		})
+	} else {
+		eb()
 	}
 }
 
