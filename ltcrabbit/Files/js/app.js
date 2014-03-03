@@ -8,6 +8,7 @@ app.nullState = {
 	sharerate: 0,
 }
 
+app.difficulty = 0
 app.state = $.extend({}, app.nullState)
 app.workers = []
 app.errCount = 0
@@ -77,17 +78,17 @@ app.start = function()
 	{	  
 	    Overwolf.games.onGameInFocusChanged = function()
 	    {
-	        console.log('Game in focus changed')
+	        //console.log('Game in focus changed')
 	    }
 	
 	    Overwolf.games.onRunningGameChanged = function()
 	    {
-	    	console.log('Running game changed')
+	    	//console.log('Running game changed')
 	    }
 	    
 	    Overwolf.window.onLocationChange = function()
 	    {
-	    	console.log('Location changed')    	
+	    	//console.log('Location changed')    	
 	    }
 	
 	    Overwolf.window.onResize = app.onResized()
@@ -108,16 +109,24 @@ app.start = function()
 
 app.update = function()
 {
-	ltcrabbit.getuserstatus(app.config.active.apikey, function(state)
-		{
+	ltcrabbit.getdifficulty(app.config.active.apikey, 
+		function(state)	{
+			app.difficulty = state
+			app.onUpdatePassed()
+		}, 
+		app.onUpdateFailed
+	)
+
+	ltcrabbit.getuserstatus(app.config.active.apikey,
+		function(state)	{
 			app.state = state
 			app.onUpdatePassed()
 		}, 
 		app.onUpdateFailed
 	)
 
-	ltcrabbit.getuserworkers(app.config.active.apikey, function(workers)
-		{
+	ltcrabbit.getuserworkers(app.config.active.apikey, 
+		function(workers) {
 			app.workers = workers
 			app.onUpdatePassed()
 		},
@@ -211,26 +220,25 @@ app.layout.base = {
 
 app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 	name: 'vertical',
+	fillValue: function(name, value, fractionDigits)
+	{
+		if (value) {
+			if (fractionDigits != null)
+				value = value.toFixed(fractionDigits)
+			document.getElementById(name).innerHTML = value.toString()
+		} else {
+			document.getElementById(name).innerHTML = 'n/a'
+		}							
+	},
 	onStateChanged: function(state, workers)
 	{
 		var self = this
 		return app.trace('app.layout.vertical.onStateChanged()', function()
-		{	  
-			if (state.balance) {
-				document.getElementById('Balance').innerHTML = state.balance.toString()
-			} else {
-				document.getElementById('Balance').innerHTML = 'n/a'
-			}					
-			if (state.hashrate) {
-				document.getElementById('Hashrate').innerHTML = state.hashrate.toString()
-			} else {
-				document.getElementById('Hashrate').innerHTML = 'n/a'
-			}
-			if (state.sharerate) {
-				document.getElementById('Sharerate').innerHTML = state.sharerate.toFixed(2).toString()
-			} else {
-				document.getElementById('Sharerate').innerHTML = 'n/a'
-			}
+		{
+			self.fillValue('Difficulty', app.difficulty, 0)
+			self.fillValue('Balance', state.balance, 8)
+			self.fillValue('Hashrate', state.hashrate, null)
+			self.fillValue('Sharerate', state.sharerate, 2)
 			var winfo = ''
 			if (state && workers) {			
 				winfo += '<ul class="fa-ul">'
@@ -317,9 +325,9 @@ app.debug.logWindowParams = function()
 	}
 }
 
-/*
-//DEBUG
-app.trace = function(name, cb)
+app.tracer = {}
+
+app.tracer.debug = function(name, cb)
 {
 	console.log('--> ' + name)
 	try {
@@ -333,11 +341,10 @@ app.trace = function(name, cb)
 		throw e
 	}
 }
-*/
 
-//RELEASE
-app.trace = function(name, cb)
+app.tracer.release = function(name, cb)
 {
 	return cb()
 }
 
+app.trace = app.tracer.release
