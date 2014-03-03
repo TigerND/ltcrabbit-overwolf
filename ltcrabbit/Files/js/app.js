@@ -294,7 +294,7 @@ app.layout.about = $.extend($.extend({}, app.layout.base), {
 		var self = this
 		return app.trace('app.layout.about.onActivated()', function()
 		{	  
-			Overwolf.window.resizeTo(Math.max(Overwolf.window.outerWidth,380), Math.max(Overwolf.window.outerHeight,500))
+			Overwolf.window.resizeTo(Math.max(Overwolf.window.outerWidth,380), Math.max(Overwolf.window.outerHeight,510))
 		})
 	},
 })
