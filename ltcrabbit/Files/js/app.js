@@ -268,6 +268,15 @@ app.config2 = {
 
 app.config2.active = $.extend({}, app.config2.default)	
 
+app.forEachMiner = function(miner, handler) {
+	for (var k in app.miners) {
+		if (app.miners.hasOwnProperty(k)) {
+			var info = app.miners[k]
+			handler(info)
+		}
+	}
+}
+
 app.start = function()
 {
 	var self = this
@@ -629,54 +638,82 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 			for (var k in app.miners) {
 				if (app.miners.hasOwnProperty(k)) {
 					var info = app.miners[k]
-					console.log('Processing ' + (info.config.Name || info.config.Address))
-					if (info.errCount > 10 * 3) {
-						minfo += '<div>'
-						minfo += '<span class="dev-info-error RoundCornersThree">'
-						minfo += '<span>Errors:&nbsp;' + info.errCount + '</span>'
-						minfo += '</span>'							
-						minfo += '</div>'							
-					} else {
-						if (info.summary.data) {
-							minfo += '<div><h4>' + (info.config.Name || info.config.Address) + '</h4></div>'
-							minfo += '<div>'
-							info.devs.data.forEach(function(v) {
-								var dev = v
-								var cls = 'dev-info-alive'
-								if ((dev['Status'] != 'Alive') || (dev["Hardware Errors"] > 0)) {
-									var cls = 'dev-info-error'
-								}
-								minfo += '<span class="' + cls + ' RoundCornersThree">'
-								minfo += '<span>' + dev['Temperature'] + '&deg;</span>|'
-								minfo += '<span>' + dev['Fan Percent'] + '%</span>|'
-								minfo += '<span>' + (dev['MHS 5s']*1000).toFixed(0) + '</span>|'
-								minfo += '<span>' + dev['Accepted'] + '</span>/'
-								minfo += '<span>' + dev['Rejected'] + '</span>'
-								minfo += '</span> '							
-							})						
-							var pinfo = ''
-							info.pools.data.forEach(function(v) {
-								var pool = v
-								console.log(JSON.stringify(pool))							
-								if (pinfo) {
-									pinfo += '|'
-								}
-								if (pool.Status == 'Alive') {
-									pinfo += '<span>' + pool.Accepted + '</span>'
-									if (pool.Rejected > 0) {
-										pinfo += '/<span class="pool-info-rejected">' + pool.Rejected + '</span>'
-									}
-								} else {
-									pinfo += '<i class="fa fa-warning"></i>'							
-								}							
-							})
-							if (pinfo) {
-								minfo += '<span class="pool-info RoundCornersThree">' + pinfo + '</span>'
-							}
-							minfo += '</div>'						
-						}
+					var title = (info.config.Name || info.config.Address)
+					console.log('Processing ' + title)
+					minfo += '<div class="miner-info">'
+					minfo += '<table>'
+					minfo += '<thead>'
+					minfo += '<tr>'
+					minfo += '<th>'
+					minfo += title
+					minfo += '</th>'
+					minfo += '</tr>'
+					minfo += '</thead>'
+					
+					if (info.errCount > 7 * 3) {
+						minfo += '<tr class="dev-info-error">'
+						minfo += '<td>'
+						minfo += '<i class="fa fa-warning"></i>'
+						minfo += 'Errors:&nbsp'
+						minfo += info.errCount
+						minfo += '</td>'
+						minfo += '</tr>'
+						info.summary.data = {}
 					}
+					if (info.summary.data) {
+						minfo += '<tr>'
+						minfo += '<td>'							
+							minfo += '<div class="device-info">'
+							minfo += '<table>'
+								info.devs.data.forEach(function(v) {
+									var dev = v
+									var cls = 'dev-info-alive'
+									if ((dev['Status'] != 'Alive') || (dev["Hardware Errors"] > 0)) {
+										var cls = 'dev-info-error'
+									}
+									minfo += '<tr>'
+									minfo += '<td><span class="' + cls + '">' + dev['Temperature'] + '&deg;</span></td>'
+									minfo += '<td><span class="' + cls + '">' + dev['Fan Percent'] + '%</span></td>'
+									minfo += '<td><span class="' + cls + '">' + (dev['MHS 5s']*1000).toFixed(0) + '</span></td>'
+									minfo += '<td><span class="' + cls + '">' + dev['Accepted'] + '/' + dev['Rejected'] + '</span></td>'
+									minfo += '</tr> '							
+								})
+							minfo += '</table>'
+							minfo += '</div>'
+						minfo += '</td>'
+						minfo += '</tr>'
+
+						var pinfo = ''
+						info.pools.data.forEach(function(v) {
+							var pool = v
+							pinfo += '<td>'
+							if (pool.Status == 'Alive') {
+								pinfo += '<span class="pool-info-accepted">' + pool.Accepted + '</span>'
+								if (pool.Rejected > 0) {
+									pinfo += '/<span class="pool-info-rejected">' + pool.Rejected + '</span>'
+								}
+							} else {
+								pinfo += '<i class="fa fa-warning pool-info-offline"></i>'							
+							}
+							pinfo += '</td>'
+						})
+						if (pinfo) {
+							minfo += '<tr>'
+							minfo += '<td>'
+								minfo += '<div class="pool-info">'
+									minfo += '<table>'
+									minfo += '<tr>'
+									minfo += pinfo
+									minfo += '</tr>'
+									minfo += '</table>'
+								minfo += '</div>'
+							minfo += '</td>'
+							minfo += '</tr>'
+						}							
+					}					
 				}
+				minfo += '</table>'
+				minfo += '</div>'
 			}
 			$('#Miners').html(minfo)
 		})

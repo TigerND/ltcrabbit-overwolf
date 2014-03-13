@@ -112,51 +112,100 @@ li {
     background-color: #ccc;
 }   
 
-table, th, td {
-    
+table, th, td {    
     border-collapse: collapse;
     border: none;
-    margin: 10px 0px;
+    margin: 2px 0px;
 }
 
 th {
     background: none repeat scroll 0 0 #333;
     color: #e5e5e5;
-    padding: 0px 10px 0px 6px;
+    padding: 0px 2px 0px 2px;
     font-size: 1em;
     font-weight: normal;
     letter-spacing: normal;
     line-height: 2.6em;
     text-transform: capitalize;
-    border-right: 1px solid #0d0d0d;
-    
+    border-right: 1px solid #0d0d0d;    
 }
 
 th:first-child {
-    -moz-border-radius: 6px 0 0 0;
-    -webkit-border-radius: 6px 0 0 0;
-    border-radius: 6px 0 0 0;
+    -moz-border-radius: 3px 0 0 0;
+    -webkit-border-radius: 3px 0 0 0;
+    border-radius: 3px 0 0 0;
     border-right: 1px solid #0d0d0d;
 }
 
 th:last-child {
-    -moz-border-radius: 0 6px 0 0;
-    -webkit-border-radius: 0 6px 0 0;
-    border-radius: 0 6px 0 0;
+    -moz-border-radius: 0 3px 0 0;
+    -webkit-border-radius: 0 3px 0 0;
+    border-radius: 0 3px 0 0;
     border-right: none;
 }
 
 th:only-child {
-    -moz-border-radius: 6px 6px 0 0;
-    -webkit-border-radius: 6px 6px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    -webkit-border-radius: 3px 3px 0 0;
 }
-
-
 
 td {
     border-top: none;
     border-bottom: 1px solid #333333;
-    padding: 10px 10px 10px 10px;
+    padding: 2px 2px 2px 2px;
+}
+
+.miner-info table {
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+}
+
+.miner-info th:only-child {
+    -moz-border-radius: 3px 3px 0 0;
+    -webkit-border-radius: 3px 3px 0 0;
+    line-height: 1.2em;
+    font-weight: 400;
+    padding: 3px;
+    margin: 0px;
+}
+
+.miner-info th {
+    border: none;    
+    padding: 0px;
+    margin: 0px;
+}
+
+.miner-info td,
+.miner-info tr {
+    border: none;    
+    padding: 0px;
+    margin: 0px;
+}
+
+.device-info td,
+.device-info tr {
+    border-left: none;	
+    border-right: none;
+	border-top: none;
+    border-bottom: 1px solid #333333;
+    padding: 3px 3px 3px 3px;
+}
+
+.pool-info table {
+    width: 100%;
+    border-left: none;	
+    border-right: none;
+    border-top: none;
+    border-bottom: none;
+    border: none;
+}
+
+.pool-info {
+    border-bottom: 1px solid #333333;
+    padding: 3px 3px 3px 3px;
+    margin: 0px;
 }
 
 .donations {
@@ -196,14 +245,15 @@ td {
 	padding: 5px;
 }
 
-.pool-info {
-	padding: 0px 2px;
-	margin: 1px;
-	font-size: 0.875em;
-	border: 1px solid #999999;
+.pool-info-accepted {
 }
 
 .pool-info-rejected {
+	text-shadow: 0px 0px 5px #ff0000;
+}
+
+.pool-info-offline {
+	font-size: 0.90em;
 	text-shadow: 0px 0px 5px #ff0000;
 }
 
@@ -211,13 +261,13 @@ td {
 	padding: 0px 2px;
 	margin: 1px;
 	font-size: 0.875em;
-	border: 1px solid #999999;	
+	border: none;	
 }
 
 .dev-info-error {
 	padding: 0px 2px;
 	margin: 1px;
 	font-size: 0.875em;
-	border: 1px solid #ff0000;	
+	border: none;	
 	text-shadow: 0px 0px 5px #ff0000;
 }
