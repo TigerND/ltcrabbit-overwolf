@@ -4,10 +4,13 @@
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<script type="text/javascript" language="JavaScript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700'/>
+	<script type="text/javascript" language="JavaScript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	
 	<!-- 
 	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://bootswatch.com/slate/bootstrap.min.css">
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	-->
 
@@ -16,12 +19,12 @@
 	<script type="text/javascript" language="JavaScript" src="OverwolfAPI_Simulator-v1.0.js"></script>
 	-->
 
+   	<link rel="stylesheet" href="css/onde.css"/>
+	<script type="text/javascript" language="JavaScript" src="js/onde.js"></script>
+
+   	<link rel="stylesheet" href="css/style.css"/>
 	<script type="text/javascript" language="JavaScript" src="js/ltcrabbit.js"></script>
 	<script type="text/javascript" language="JavaScript" src="js/app.js"></script>
-
-	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700'/>
-   	<link rel="stylesheet" href="css/style.css"/>
 
 	<title>LTCRabbit Monitor</title>
 </head>
@@ -37,21 +40,38 @@
 	    <div>
             <h3>Summary</h3>
 		    <ul class="fa-ul">
-		    	<li><i class="fa-li fa fa-cloud"></i> <span id="Difficulty">n/a</span></li>
 		    	<li><i class="fa-li fa fa-money"></i> <span id="Balance">n/a</span></li>		    	
 		    	<li><i class="fa-li fa fa-tasks"></i> <span id="Hashrate">n/a</span></li>		    	
 		    	<li><i class="fa-li fa fa-dashboard"></i> <span id="Sharerate">n/a</span></li>		    	
 		    </ul>
 	    </div>
-	    <div>
-            <h3>Workers</h3>
+	    <div>            
 		    <div id="Workers">
+		    </div>
+		</div>
+	    <div>            
+		    <div id="Miners">
 		    </div>
 		</div>
     </div>
 
     <div id="tab-settings-layout" class="StartHidden">
-	    <div style="margin:2px;">
+	    <div id="onde-settings" style="margin:2px;">
+	    	<h3>Settings</h3>
+		    <form id="onde-settings-form" class="navbar-form navbar-left" method="post">			  
+			  <div class="form-group">
+			    <div class="onde-panel"></div>
+			    <p>
+			    <div class="form-actions">
+				  <button type="submit" name="submit" class="btn btn-primary">Save changes</button>
+				  <button type="button" class="btn" onclick="app.layout.vertical.activate();">Cancel</button>
+				</div>
+				</p>			  
+			  </div>
+			</form>
+	    </div>
+	    
+	    <div class="StartHidden" style="margin:2px;">
             <h3>Pool settings</h3>
     		<div>
     			<label for="inputUserId">Address</label>
@@ -67,13 +87,14 @@
     		</div>		    	
     		<div>
     		    <p>
-    		    	<button type="button" onclick="app.layout.vertical.activate();">Save</button>
+    		    	<button type="button" class="btn btn-default" onclick="app.layout.vertical.activate();">Save</button>
     		    </p>		    
     		</div>		    	
 	    	<div>
 	    		<p>You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <strong><a href='javascript: window.open("https://www.ltcrabbit.com/index.php?page=account&action=edit")'>Account&nbsp;Settings</a></strong> page</p>
 	    	</div>
 	    </div>
+	    
     </div>
 
     <div id="tab-about-layout" class="StartHidden">
@@ -85,7 +106,7 @@
                		<center>
                		  <img src='logo.gif'/>
                		  <div>
-               		   <h2 style="text-shadow: 0px 0px 10px #fff;">LTCRABBIT</h2><p>Version 1.0.1
+               		   <h2 style="text-shadow: 0px 0px 10px #fff;"><strong>LTCRABBIT</strong></h2><p>Version 1.0.2
                		   </p>
                		  </div>
                		</center>
@@ -93,62 +114,23 @@
 	            </tr>
 	            <tr>
 	              <td>	        
-			        <p>This application is meant to monitor your <a href='javascript: window.open("https://www.ltcrabbit.com/")'>LTCRabbit</a> mining pool workers using public API
-			        </p>
+			        <div class='txt-about'>
+				        <p>This application is meant to monitor your <a href='javascript: window.open("https://www.ltcrabbit.com/")'>LTCRabbit</a> mining pool workers using public API.
+				        </p>
+				        <p>If you dont have an LTCRabbit account, you can <a class='btn-register RoundCornersThree' href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Register&nbsp;Here</strong></a> to support this software.
+				        </p>
+			        </div>
 	              </td>
 	            </tr>
 	            <tr>
-	              <td style="text-align: right">	        
-			        
+	              <td style="text-align: right">	        			        
 			        <div style="font-size: 0.8em">
 				        Any donation are appreciated:&nbsp;			        
 					    <span class="btn-group" id="Donations">
 					        <span><a style="text-shadow: 0px 0px 10px #555;" href='javascript: window.open("https://ltc.blockr.io/address/info/LKuUePjgagcEa5oQKgaE5CYExrzm4LPEPz")'>Litecoin</a></span>&nbsp;
 				    	    <span><a style="text-shadow: 0px 0px 10px #555;" href='javascript: window.open("https://blockr.io/address/info/149jb88A368BiRDA9swufA8nxN87J5Hstv")'>Bitcoin</a></span>
 				    	</span>
-					 </div>
-
-			        <!-- 
-			        <div>
-				        Donate:&nbsp;			        
-					    <span class="btn-group" id="Donations">
-				    	    <script src="http://coinwidget.com/widget/coin.js"></script>
-				    	    <span>
-								<script>
-								CoinWidgetCom.go({
-									wallet_address: "149jb88A368BiRDA9swufA8nxN87J5Hstv"
-									, currency: "bitcoin"
-									, counter: "count"
-									, alignment: "ac"
-									, qrcode: true
-									, auto_show: false
-									, lbl_button: "BTC"
-									, lbl_address: "My Bitcoin Address:"
-									, lbl_count: "donations"
-									, lbl_amount: "BTC"
-								});
-								</script>
-							</span>						
-				    	    <span>
-								<script>
-								CoinWidgetCom.go({
-									wallet_address: "LKuUePjgagcEa5oQKgaE5CYExrzm4LPEPz"
-									, currency: "litecoin"
-									, counter: "count"
-									, alignment: "ar"
-									, qrcode: true
-									, auto_show: false
-									, lbl_button: "LTC"
-									, lbl_address: "My Litecoin Address:"
-									, lbl_count: "donations"
-									, lbl_amount: "LTC"
-								});
-								</script>
-							</span>							
-						 </span>
-					 </div>
-					 -->
-					 
+					 </div>					 
 	              </td>
 	            </tr>
 	          </tbody>

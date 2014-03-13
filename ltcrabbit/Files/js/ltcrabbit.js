@@ -17,7 +17,7 @@ ltcrabbit.eval = function(action, apikey, id, cb, eb)
 {
 	var url = ltcrabbit.url(action, apikey, id)
 	if (url) {
-		console.log(url)
+		//console.log(url)
 		$.ajax({
 		    url: url,
 		    dataType: "json"
