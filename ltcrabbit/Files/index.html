@@ -33,17 +33,41 @@
     <div class="btn-group" id="TopMenu">
 	  <a href="javascript: app.layout.vertical.activate();"><i class="fa fa-home fa-fw"></i></a>
 	  <a href="javascript: app.layout.settings.activate();"><i class="fa fa-cogs fa-fw"></i></a>
-	  <a href="javascript: app.layout.about.activate();"><i class="fa fa-certificate fa-fw"></i></a>
+	  <a href="javascript: app.layout.about.activate();"><i class="fa fa-certificate fa-fw"></i></a>	  
 	</div>
+	<br>
 
     <div id="tab-vertical-layout" class="StartHidden">
-	    <div>
-            <h3>Summary</h3>
-		    <ul class="fa-ul">
-		    	<li><i class="fa-li fa fa-money"></i> <span id="Balance">n/a</span></li>		    	
-		    	<li><i class="fa-li fa fa-tasks"></i> <span id="Hashrate">n/a</span></li>		    	
-		    	<li><i class="fa-li fa fa-dashboard"></i> <span id="Sharerate">n/a</span></li>		    	
-		    </ul>
+	    <div class="miner-info">
+	      <table>
+	        <thead>
+	          <tr>
+	            <th colspan="2">Summary</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          <tr>
+	            <td>
+		          <div class="device-info">
+		            <table>
+			          <tr>
+			            <td align="left"><span class="dev-info-alive">Balance<span></td>
+			            <td align="right"><span class="dev-info-alive" id="Balance">n/a</span></td>
+			          </tr>
+			          <tr>
+			            <td align="left"><span class="dev-info-alive">Hashrate</span></td>
+			            <td align="right"><span class="dev-info-alive" id="Hashrate">n/a</span></td>
+			          </tr>
+			          <tr>
+			            <td align="left"><span class="dev-info-alive">Sharerate</span></td>
+			            <td align="right"><span class="dev-info-alive" id="Sharerate">n/a</span></td>
+			          </tr>
+			        </table>
+			      </div>
+		        </td>
+		      </tr>
+	        </tbody>
+	      </table>
 	    </div>
 	    <div>            
 		    <div id="Workers">
@@ -110,7 +134,7 @@
                		<center>
                		  <img src='logo.gif'/>
                		  <div>
-               		   <h2 style="text-shadow: 0px 0px 10px #fff;"><strong>LTCRABBIT</strong></h2><p>Version 1.0.2
+               		   <a href='javascript: window.open("https://www.ltcrabbit.com/#afc17o/")'><h2 style="text-shadow: 0px 0px 10px #fff;"><strong>LTCRABBIT</strong></h2></a><p>Version 1.0.2
                		   </p>
                		  </div>
                		</center>
@@ -119,7 +143,7 @@
 	            <tr>
 	              <td>	        
 			        <div class='txt-about'>
-				        <p>This application is meant to monitor your <a href='javascript: window.open("https://www.ltcrabbit.com/")'>LTCRabbit</a> mining pool workers using public API.
+				        <p>This application is meant to monitor your <a href='javascript: window.open("https://www.ltcrabbit.com/#afc17o/")'>LTCRabbit</a> mining pool workers using public API.
 				        </p>
 				        <p>If you dont have an LTCRabbit account, you can <a class='btn-register RoundCornersThree' href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Register&nbsp;Here</strong></a> to support this software.
 				        </p>

@@ -156,6 +156,7 @@ td {
 }
 
 .miner-info table {
+    table-layout: auto;
     width: 100%;
     padding: 0px;
     margin: 0px;
@@ -265,9 +266,8 @@ td {
 }
 
 .dev-info-error {
-	padding: 0px 2px;
-	margin: 1px;
-	font-size: 0.875em;
+	padding: 0px 3px;
+	margin: 3px;
 	border: none;	
 	text-shadow: 0px 0px 5px #ff0000;
 }

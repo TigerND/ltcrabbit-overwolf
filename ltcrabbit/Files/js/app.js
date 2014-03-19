@@ -72,7 +72,7 @@ app.config2 = {
 			},
 			Pool: {
 				type: 'object',
-				label: "LTCRabbit",
+				label: "LTCRabbit Public API",
 				properties: {
 					Address: { 
 						type: 'string',
@@ -82,7 +82,7 @@ app.config2 = {
 					Workers: {
 						type: "array",
 						label: "Accounts",
-						description: "You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <a href='javascript: window.open(\"https://www.ltcrabbit.com/index.php?page=account&action=edit\")'><strong>Account&nbsp;Settings</strong></a> page" +
+						description: "You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <a href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Account&nbsp;Settings</strong></a> page" +
 									 "If you dont have an LTCRabbit account, you can <a class='btn-register RoundCornersThree' href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Register&nbsp;Here</strong></a> to support this software",
 						items: {
 							type: "object",    	                
@@ -108,13 +108,13 @@ app.config2 = {
 			},
 			Farm: {
 				type: 'object',
-				label: "Farm",
+				label: "CGMiner/BFGMiner API",
 				properties: {
 					Proxy: { 
 						type: 'string',
 						label: "Proxy",
-						required: false,
-						description: "Neither <i>CGMiner</i> nor <i>BFGMiner</i> support HTTP API. However you can use <a href='javascript: window.open(\"https://github.com/TigerND/cgminer2http\")'><strong>cgminer2http</strong></a> proxy to monitor you miners",
+						required: false,						
+						description: "This monitor doesn't support direct TCP connections to CGMiner/BFGMiner API. However you can use <a href='javascript: window.open(\"https://github.com/TigerND/cgminer2http\")'><strong>cgminer2http</strong></a> proxy to monitor you miners",
 					},
 					Miners: {
 						type: "array",
@@ -133,6 +133,10 @@ app.config2 = {
 								Address: { 
 									type: "string", 
 									required: true 
+									},
+								Proxy: { 
+									type: "string", 
+									required: false
 									}
 								}
 							}
@@ -613,21 +617,46 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 			for (var k in app.states) {
 				if (app.states.hasOwnProperty(k)) {
 					var info = app.states[k]
+					winfo += '<div class="miner-info">'
+					winfo += '<table>'
+					winfo += '<thead>'
+					winfo += '<tr>'
+					winfo += '<th>'
 					if (info.state && info.state.username) {
-						winfo += '<h3>' + info.state.username + '</h3>'	
+						winfo += info.state.username	
 					} else {
-						winfo += '<h3>Workers</h3>'
+						winfo += 'Workers'
 					}
+					winfo += '</th>'
+					winfo += '</tr>'
+					winfo += '</thead>'
 					if (info.state && info.workers) {			
-						winfo += '<ul class="fa-ul">'
+						winfo += '<tr>'
+						winfo += '<td>'							
+						winfo += '<div class="device-info">'
+						winfo += '<table>'						
 						info.workers.forEach(function(worker) {
-							winfo += '<li><i class="fa-li fa fa-tasks"></i> <span>'+ worker.workername + ':&nbsp;' + worker.hashrate.toString() + '</span></li>' 
+							winfo += '<tr>'
+							winfo += '<td align="left"><span class="dev-info-alive">' + worker.workername + '</span></td>'
+							winfo += '<td align="right"><span class="dev-info-alive">' + worker.hashrate.toString() + '</span></td>'
+							winfo += '</tr> '							
 						})
-						if (info.errCount) {
-							winfo += '<li><i class="fa-li fa fa-warning"></i> <span>Errors:&nbsp;' + info.errCount + '</span></li>'
+						if (info.errCount > 10) {
+							winfo += '<tr class="dev-info-error">'
+							winfo += '<td>'
+							winfo += '<i class="fa fa-warning"></i>&nbsp;'
+							winfo += 'Errors:&nbsp'
+							winfo += info.errCount
+							winfo += '</td>'
+							winfo += '</tr>'
 						}
-						winfo += '</ul>'
+						winfo += '</table>'
+						winfo += '</div>'
+						winfo += '</td>'
+						winfo += '</tr>'
 					}
+					winfo += '</table>'
+					winfo += '</div>'					
 				}
 			}
 			$('#Workers').html(winfo)
@@ -650,16 +679,6 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 					minfo += '</tr>'
 					minfo += '</thead>'
 					
-					if (info.errCount > 7 * 3) {
-						minfo += '<tr class="dev-info-error">'
-						minfo += '<td>'
-						minfo += '<i class="fa fa-warning"></i>'
-						minfo += 'Errors:&nbsp'
-						minfo += info.errCount
-						minfo += '</td>'
-						minfo += '</tr>'
-						info.summary.data = {}
-					}
 					if (info.summary.data) {
 						minfo += '<tr>'
 						minfo += '<td>'							
@@ -672,7 +691,7 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 										var cls = 'dev-info-error'
 									}
 									minfo += '<tr>'
-									minfo += '<td><span class="' + cls + '">' + dev['Temperature'] + '&deg;</span></td>'
+									minfo += '<td><span class="' + cls + '">' + dev['Temperature'] + '&deg;</legend></span></td>'
 									minfo += '<td><span class="' + cls + '">' + dev['Fan Percent'] + '%</span></td>'
 									minfo += '<td><span class="' + cls + '">' + (dev['MHS 5s']*1000).toFixed(0) + '</span></td>'
 									minfo += '<td><span class="' + cls + '">' + dev['Accepted'] + '/' + dev['Rejected'] + '</span></td>'
@@ -682,7 +701,8 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 							minfo += '</div>'
 						minfo += '</td>'
 						minfo += '</tr>'
-
+						
+						/*
 						var pinfo = ''
 						info.pools.data.forEach(function(v) {
 							var pool = v
@@ -709,8 +729,19 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 								minfo += '</div>'
 							minfo += '</td>'
 							minfo += '</tr>'
-						}							
+						}
+						*/							
 					}					
+					if (info.errCount > 10) {
+						minfo += '<tr class="dev-info-error">'
+						minfo += '<td>'
+						minfo += '<i class="fa fa-warning"></i>&nbsp;'
+						minfo += 'Errors:&nbsp'
+						minfo += info.errCount
+						minfo += '</td>'
+						minfo += '</tr>'
+						info.summary.data = {}
+					}
 				}
 				minfo += '</table>'
 				minfo += '</div>'
