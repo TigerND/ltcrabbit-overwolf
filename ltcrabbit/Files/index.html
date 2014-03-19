@@ -30,12 +30,22 @@
 </head>
 <body>
 
-    <div class="btn-group" id="TopMenu">
-	  <a href="javascript: app.layout.vertical.activate();"><i class="fa fa-home fa-fw"></i></a>
-	  <a href="javascript: app.layout.settings.activate();"><i class="fa fa-cogs fa-fw"></i></a>
-	  <a href="javascript: app.layout.about.activate();"><i class="fa fa-certificate fa-fw"></i></a>	  
-	</div>
-	<br>
+    <table width="100%">
+    <tr>
+      <td>
+	    <div class="btn-group" id="TopMenu">
+		  <a href="javascript: app.layout.vertical.activate();"><i class="fa fa-home fa-fw"></i></a>
+		  <a href="javascript: app.layout.settings.activate();"><i class="fa fa-cogs fa-fw"></i></a>
+		  <a href="javascript: app.layout.about.activate();"><i class="fa fa-certificate fa-fw"></i></a>	  
+		</div>
+	  </td>
+      <td align="right">
+	    <div class="btn-group" id="LinksMenu">
+		  <a href='javascript: window.open("https://www.ltcrabbit.com/#afc17o");'><i class="fa fa-globe fa-fw"></i></a>
+		</div>
+	  </td>
+	</tr>
+	</table>
 
     <div id="tab-vertical-layout" class="StartHidden">
 	    <div class="miner-info">
@@ -77,10 +87,6 @@
 		    <div id="Miners">
 		    </div>
 		</div>
-	    <div>            
-		    <div id="info-panel">
-		    </div>
-		</div>
     </div>
 
     <div id="tab-settings-layout" class="StartHidden">
@@ -119,7 +125,7 @@
     		    </p>		    
     		</div>		    	
 	    	<div>
-	    		<p>You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <strong><a href='javascript: window.open("https://www.ltcrabbit.com/index.php?page=account&action=edit")'>Account&nbsp;Settings</a></strong> page</p>
+	    		<p>You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <strong><a href='javascript: window.open("https://www.ltcrabbit.com/#afc17o")'>Account&nbsp;Settings</a></strong> page</p>
 	    	</div>
 	    </div>
 	    
@@ -143,7 +149,7 @@
 	            <tr>
 	              <td>	        
 			        <div class='txt-about'>
-				        <p>This application is meant to monitor your <a href='javascript: window.open("https://www.ltcrabbit.com/#afc17o/")'>LTCRabbit</a> mining pool workers using public API.
+				        <p>This application is meant to monitor your <a href='javascript: window.open("https://www.ltcrabbit.com/#afc17o")'>LTCRabbit</a> mining pool workers using public API.
 				        </p>
 			        </div>
 	              </td>
