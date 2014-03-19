@@ -642,7 +642,7 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 							winfo += '</tr> '							
 						})
 						if (info.errCount > 10) {
-							winfo += '<tr class="dev-info-error">'
+							winfo += '<tr class="ltcm-note-error">'
 							winfo += '<td>'
 							winfo += '<i class="fa fa-warning"></i>&nbsp;'
 							winfo += 'Errors:&nbsp'
@@ -733,7 +733,7 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 						*/							
 					}					
 					if (info.errCount > 10) {
-						minfo += '<tr class="dev-info-error">'
+						minfo += '<tr class="ltcm-note-error">'
 						minfo += '<td>'
 						minfo += '<i class="fa fa-warning"></i>&nbsp;'
 						minfo += 'Errors:&nbsp'

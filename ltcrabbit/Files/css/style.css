@@ -268,6 +268,22 @@ td {
 .dev-info-error {
 	padding: 0px 3px;
 	margin: 3px;
+	font-size: 0.875em;
+	border: none;	
+	text-shadow: 0px 0px 5px #ff0000;
+}
+
+.ltcm-note-info {
+	padding: 0px 2px;
+	margin: 1px;
+	font-size: 0.5em;
+	border: none;	
+}
+
+.ltcm-note-error {
+	padding: 0px 3px;
+	margin: 3px;
+	font-size: 0.5em;
 	border: none;	
 	text-shadow: 0px 0px 5px #ff0000;
 }
