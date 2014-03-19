@@ -282,14 +282,14 @@ td {
 .ltcm-note-info {
 	padding: 0px 2px;
 	margin: 1px;
-	font-size: 0.6em;
+	font-size: 0.7em;
 	border: none;	
 }
 
 .ltcm-note-error {
 	padding: 0px 3px;
 	margin: 3px;
-	font-size: 0.6em;
+	font-size: 0.7em;
 	border: none;	
 	text-shadow: 0px 0px 5px #ff0000;
 }

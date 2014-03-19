@@ -82,8 +82,7 @@ app.config2 = {
 					Workers: {
 						type: "array",
 						label: "Accounts",
-						description: "You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <a href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Account&nbsp;Settings</strong></a> page" +
-									 "If you dont have an LTCRabbit account, you can <a class='btn-register RoundCornersThree' href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Register&nbsp;Here</strong></a> to support this software",
+						description: "You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <a href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Account&nbsp;Settings</strong></a> page",
 						items: {
 							type: "object",    	                
 							properties: {
