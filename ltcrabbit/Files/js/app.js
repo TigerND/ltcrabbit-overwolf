@@ -917,4 +917,4 @@ app.tracer.release = function(name, cb)
 	return cb()
 }
 
-app.trace = app.tracer.debug
+app.trace = app.tracer.release
