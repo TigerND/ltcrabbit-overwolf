@@ -239,6 +239,7 @@ app.config2 = {
 			
 				app.errCount = 0
 				app.states = {}
+				app.miners = {}
 			
 				app.onStateChanged()
 				return true;
@@ -330,10 +331,41 @@ app.stateForWorker = function(worker)
 		app.states[worker.UserId] = {
 			state: $.extend({}, app.nullState),
 			workers: [],
-			errCount: 0
+			errCount: 0,
+			firstErrorTime: null
 		}
 	}
 	return app.states[worker.UserId]
+}
+
+app.minerStateInfoObject = function(data)
+{
+	this.requestTime = null
+	this.responseTime = null
+	this.emptyData = data
+	this.data = data
+	this.isExpired = function(timeout)
+	{		
+		if (!this.requestTime)
+			return true
+		now = new Date().getTime()
+		if ((this.responseTime) && (now - timeout > this.responseTime))
+			return true
+		return false
+	}
+	this.clear = function()
+	{
+		this.data = this.emptyData
+	}
+	this.onRequest = function()
+	{
+		this.requestTime = new Date().getTime()
+	}
+	this.onResponse = function(data)
+	{
+		this.responseTime = new Date().getTime()
+		this.data = data
+	}
 }
 
 app.getMinerState = function(miner)
@@ -342,22 +374,11 @@ app.getMinerState = function(miner)
 	if (!app.miners.hasOwnProperty(id)) {
 		app.miners[id] = {
 			config: miner,
-			summary: {
-				requestTime: null,
-				responseTime: null,
-				data: {}
-			},
-			pools: {
-				requestTime: null,
-				responseTime: null,
-				data: [],
-			},
-			devs: {
-				requestTime: null,
-				responseTime: null,
-				data: []
-			},
-			errCount: 0
+			summary: new app.minerStateInfoObject({}),
+			pools: new app.minerStateInfoObject([]),
+			devs: new app.minerStateInfoObject([]),
+			errCount: 0,
+			firstErrorTime: null
 		}
 	}
 	return app.miners[id]
@@ -405,24 +426,20 @@ app.update = function()
 				var info = app.stateForWorker(worker)
 				ltcrabbit.getuserstatus(worker.ApiKey,
 					function(state)	{
-						info.errCount = 0
 						info.state = state
-						app.onUpdatePassed()
+						app.onWorkerUpdatePassed(info)
 					}, 
 					function() {
-						info.errCount += 1
-						app.onUpdateFailed()
+						app.onWorkerUpdateFailed(info, null)
 					}				
 				)
 				ltcrabbit.getuserworkers(worker.ApiKey, 
 					function(workers) {						
-						info.errCount = 0
 						info.workers = workers
-						app.onUpdatePassed()
+						app.onWorkerUpdatePassed(info)
 					},
 					function()	{						
-						info.errCount += 1
-						app.onUpdateFailed()
+						app.onWorkerUpdateFailed(info, null)
 					}
 				)
 			}
@@ -433,36 +450,40 @@ app.update = function()
 				var miner = v
 				if (!miner.Disabled) {
 					var info = app.getMinerState(miner)
-					info.summary.requestTime = new Date().getTime()
-					app.cgminerCommand(proxy, info, {command: 'summary'}, 
-						function(data) {
-							info.summary.responseTime = new Date().getTime()
-							info.summary.data = data.SUMMARY[0]							
-							app.onMinerUpdatePassed(info)					
-						}, function (reason) {
-							app.onMinerUpdateFailed(info, reason)
-						}
-					)
-					info.pools.requestTime = new Date().getTime()
-					app.cgminerCommand(proxy, info, {command: 'pools'}, 
-						function(data) {
-							info.pools.responseTime = new Date().getTime()
-							info.pools.data = data.POOLS							
-							app.onMinerUpdatePassed(info)					
-						}, function (reason) {
-							app.onMinerUpdateFailed(info, reason)
-						}
-					)
-					info.devs.requestTime = new Date().getTime()
-					app.cgminerCommand(proxy, info, {command: 'devs'}, 
-						function(data) {
-							info.devs.responseTime = new Date().getTime()
-							info.devs.data = data.DEVS							
-							app.onMinerUpdatePassed(info)					
-						}, function (reason) {
-							app.onMinerUpdateFailed(info, reason)
-						}
-					)
+					console.log(JSON.stringify(info.summary))
+					if (info.summary.isExpired(app.config2.active.UpdateInterval)) {
+						info.summary.onRequest()
+						app.cgminerCommand(proxy, info, {command: 'summary'}, 
+							function(data) {
+								info.summary.onResponse(data.SUMMARY[0])
+								app.onMinerUpdatePassed(info)					
+							}, function (reason) {
+								app.onMinerUpdateFailed(info, reason)
+							}
+						)						
+					}
+					if (info.pools.isExpired(app.config2.active.UpdateInterval)) {
+						info.pools.onRequest()						
+						app.cgminerCommand(proxy, info, {command: 'pools'}, 
+							function(data) {
+								info.pools.onResponse(data.POOLS)
+								app.onMinerUpdatePassed(info)					
+							}, function (reason) {
+								app.onMinerUpdateFailed(info, reason)
+							}
+						)
+					}
+					if (info.devs.isExpired(app.config2.active.UpdateInterval)) {
+						info.devs.onRequest()						
+						app.cgminerCommand(proxy, info, {command: 'devs'}, 
+							function(data) {
+								info.devs.onResponse(data.DEVS)
+								app.onMinerUpdatePassed(info)					
+							}, function (reason) {
+								app.onMinerUpdateFailed(info, reason)
+							}
+						)
+					}
 				}
 			})
 		}
@@ -471,14 +492,34 @@ app.update = function()
 	setTimeout(app.update, app.config2.active.UpdateInterval)
 }
 
+app.onWorkerUpdatePassed = function(worker)
+{
+	worker.errCount = 0
+	worker.firstErrorTime = null
+	app.onUpdatePassed()
+}
+
+app.onWorkerUpdateFailed = function(worker, reason)
+{
+	if (worker.errCount == 0) {
+		worker.firstErrorTime = new Date().getTime()
+	}		
+	worker.errCount += 1
+	app.onUpdateFailed()
+}
+
 app.onMinerUpdatePassed = function(miner)
 {
 	miner.errCount = 0
+	miner.firstErrorTime = null
 	app.onUpdatePassed()
 }
 
 app.onMinerUpdateFailed = function(miner, reason)
 {
+	if (miner.errCount == 0) {
+		miner.firstErrorTime = new Date().getTime()
+	}		
 	miner.errCount += 1
 	app.onUpdateFailed()
 }
@@ -597,6 +638,7 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 			var balance = 0.0,
 			    hashrate = 0,
 			    sharerate = 0.0
+			var now = new Date().getTime()
 			for (var k in app.states) {
 				if (app.states.hasOwnProperty(k)) {
 					var info = app.states[k]
@@ -640,7 +682,7 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 							winfo += '<td align="right"><span class="dev-info-alive">' + worker.hashrate.toString() + '</span></td>'
 							winfo += '</tr> '							
 						})
-						if (info.errCount > 10) {
+						if ((info.errCount > 0) && (now - info.firstErrorTime > 10000)) {
 							winfo += '<tr class="ltcm-note-error">'
 							winfo += '<td>'
 							winfo += '<i class="fa fa-warning"></i>&nbsp;'
@@ -731,7 +773,7 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 						}
 						*/							
 					}					
-					if (info.errCount > 10) {
+					if ((info.errCount > 0) && (now - info.firstErrorTime > 10000)) {
 						minfo += '<tr class="ltcm-note-error">'
 						minfo += '<td>'
 						minfo += '<i class="fa fa-warning"></i>&nbsp;'
