@@ -364,11 +364,16 @@ app.minerStateInfoObject = function(data)
 	this.onRequest = function()
 	{
 		this.requestTime = new Date().getTime()
+		this.responseTime = null
 	}
 	this.onResponse = function(data)
 	{
 		this.responseTime = new Date().getTime()
 		this.data = data
+	}
+	this.onError = function()
+	{
+		this.responseTime = new Date().getTime()
 	}
 }
 
@@ -382,7 +387,7 @@ app.getMinerState = function(miner)
 			pools: new app.minerStateInfoObject([]),
 			devs: new app.minerStateInfoObject([]),
 			errCount: 0,
-			firstErrorTime: null
+			firstErrorTime: null			
 		}
 	}
 	return app.miners[id]
@@ -465,6 +470,7 @@ app.update = function()
 								info.summary.onResponse(data.SUMMARY[0])
 								app.onMinerUpdatePassed(info)					
 							}, function (reason) {
+								info.summary.onError()
 								app.onMinerUpdateFailed(info, reason)
 							}
 						)						
@@ -476,6 +482,7 @@ app.update = function()
 								info.pools.onResponse(data.POOLS)
 								app.onMinerUpdatePassed(info)					
 							}, function (reason) {
+								info.pools.onError()
 								app.onMinerUpdateFailed(info, reason)
 							}
 						)
@@ -487,6 +494,7 @@ app.update = function()
 								info.devs.onResponse(data.DEVS)
 								app.onMinerUpdatePassed(info)					
 							}, function (reason) {
+								info.devs.onError()
 								app.onMinerUpdateFailed(info, reason)
 							}
 						)
