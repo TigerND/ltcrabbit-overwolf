@@ -349,7 +349,7 @@ app.minerStateInfoObject = function(data)
 		if (!this.requestTime)
 			return true
 		now = new Date().getTime()
-		if ((this.responseTime) && (now - timeout > this.responseTime))
+		if ((this.responseTime) && ((now - timeout > this.responseTime) || (now - 30000 > this.responseTime)))
 			return true
 		return false
 	}
