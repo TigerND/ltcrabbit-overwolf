@@ -1,6 +1,10 @@
 
 app = window.app = {}
 
+app.hardcoded = {
+	"maxExpirationTime": 30000
+}
+
 app.nullState = {
 	username: 'n/a',
 	balance: 0,
@@ -349,7 +353,7 @@ app.minerStateInfoObject = function(data)
 		if (!this.requestTime)
 			return true
 		now = new Date().getTime()
-		if ((this.responseTime) && ((now - timeout > this.responseTime) || (now - 30000 > this.responseTime)))
+		if ((this.responseTime) && ((now - timeout > this.responseTime) || (now - app.hardcoded.maxExpirationTime > this.responseTime)))
 			return true
 		return false
 	}
@@ -451,9 +455,12 @@ app.update = function()
 				if (!miner.Disabled) {
 					var info = app.getMinerState(miner)
 					console.log(JSON.stringify(info.summary))
+					var minerProxy = proxy;
+					if (miner.Proxy)
+						minerProxy = miner.Proxy
 					if (info.summary.isExpired(app.config2.active.UpdateInterval)) {
 						info.summary.onRequest()
-						app.cgminerCommand(proxy, info, {command: 'summary'}, 
+						app.cgminerCommand(minerProxy, info, {command: 'summary'}, 
 							function(data) {
 								info.summary.onResponse(data.SUMMARY[0])
 								app.onMinerUpdatePassed(info)					
@@ -464,7 +471,7 @@ app.update = function()
 					}
 					if (info.pools.isExpired(app.config2.active.UpdateInterval)) {
 						info.pools.onRequest()						
-						app.cgminerCommand(proxy, info, {command: 'pools'}, 
+						app.cgminerCommand(minerProxy, info, {command: 'pools'}, 
 							function(data) {
 								info.pools.onResponse(data.POOLS)
 								app.onMinerUpdatePassed(info)					
@@ -475,7 +482,7 @@ app.update = function()
 					}
 					if (info.devs.isExpired(app.config2.active.UpdateInterval)) {
 						info.devs.onRequest()						
-						app.cgminerCommand(proxy, info, {command: 'devs'}, 
+						app.cgminerCommand(minerProxy, info, {command: 'devs'}, 
 							function(data) {
 								info.devs.onResponse(data.DEVS)
 								app.onMinerUpdatePassed(info)					
