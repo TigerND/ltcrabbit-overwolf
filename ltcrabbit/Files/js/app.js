@@ -742,16 +742,18 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 							minfo += '<table>'
 								info.devs.data.forEach(function(v) {
 									var dev = v
-									var cls = 'dev-info-alive'
-									if ((dev['Status'] != 'Alive') || (dev["Hardware Errors"] > 0)) {
-										var cls = 'dev-info-error'
+									if (dev['Enabled'] == 'Y') {
+										var cls = 'dev-info-alive'
+										if ((dev['Status'] != 'Alive') || (dev["Hardware Errors"] > 0)) {
+											var cls = 'dev-info-error'
+										}
+										minfo += '<tr>'
+										minfo += '<td><span class="' + cls + '">' + dev['Temperature'] + '&deg;</legend></span></td>'
+										minfo += '<td><span class="' + cls + '">' + dev['Fan Percent'] + '%</span></td>'
+										minfo += '<td><span class="' + cls + '">' + (dev['MHS 5s']*1000).toFixed(0) + '</span></td>'
+										minfo += '<td><span class="' + cls + '">' + dev['Accepted'] + '/' + dev['Rejected'] + '</span></td>'
+										minfo += '</tr> '
 									}
-									minfo += '<tr>'
-									minfo += '<td><span class="' + cls + '">' + dev['Temperature'] + '&deg;</legend></span></td>'
-									minfo += '<td><span class="' + cls + '">' + dev['Fan Percent'] + '%</span></td>'
-									minfo += '<td><span class="' + cls + '">' + (dev['MHS 5s']*1000).toFixed(0) + '</span></td>'
-									minfo += '<td><span class="' + cls + '">' + dev['Accepted'] + '/' + dev['Rejected'] + '</span></td>'
-									minfo += '</tr> '							
 								})
 							minfo += '</table>'
 							minfo += '</div>'
