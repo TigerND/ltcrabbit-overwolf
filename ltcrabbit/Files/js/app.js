@@ -186,7 +186,7 @@ app.config2 = {
 				return false
 			}
 			self.active.Pool.UpdateInterval = Math.max(self.active.Pool.UpdateInterval, 30) || 30
-			self.active.Farm.UpdateInterval = Math.max(self.active.Farm.UpdateInterval, 1) || 1
+			self.active.Farm.UpdateInterval = Math.max(self.active.Farm.UpdateInterval, 2) || 2
 			self.active.Pool.Workers.forEach(function(v) {
 				if (!v.ApiKey) {
 					console.log("Invalid pool account parameters")
