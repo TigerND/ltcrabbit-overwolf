@@ -77,7 +77,8 @@ app.config2 = {
 				properties: {
 					UpdateInterval: { 
 						type: 'integer',
-						label: "Update interval (seconds)",
+						label: "Interval",
+						description: "Update interval (seconds)",
 						required: true 
 					},
 					Address: { 
@@ -112,7 +113,8 @@ app.config2 = {
 				properties: {
 					UpdateInterval: { 
 						type: 'integer',
-						label: "Update interval (seconds)",
+						label: "Interval",
+						description: "Update interval (seconds)",
 						required: true 
 					},
 					Proxy: { 
