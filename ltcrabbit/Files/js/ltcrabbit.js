@@ -17,7 +17,7 @@ ltcrabbit.eval = function(action, apikey, id, cb, eb)
 {
 	var url = ltcrabbit.url(action, apikey, id)
 	if (url) {
-		//console.log(url)
+		//console.log('GET: ' + url)
 		$.ajax({
 		    url: url,
 		    dataType: "json"
@@ -75,6 +75,50 @@ ltcrabbit.getuserworkers = function(apikey, cb, eb)
 				}
 			})
 			cb(data.getuserworkers)
+		},
+		eb
+	)
+}
+
+ltcrabbit.api2 = {
+	appname: 'ltcrabbitjs',
+	appversion: '0.0.1'
+}
+
+ltcrabbit.api2.url = function(action, apikey, appname, appversion)
+{
+	url = ltcrabbit.address + '?page=api&action=' + action 
+	if (apikey) {		
+		url += '&api_key=' + apikey
+		url += '&appname=' + (appname || ltcrabbit.api2.appname)
+		url += '&appversion=' + (appversion || ltcrabbit.api2.appversion)
+	}
+	return url
+}
+
+ltcrabbit.api2.eval = function(action, apikey, cb, eb)
+{
+	var url = ltcrabbit.api2.url(action, apikey)
+	if (url) {
+		console.log('GET: ' + url)
+		$.ajax({
+		    url: url,
+		    dataType: "json"
+		}).done(function(data){
+			cb(data)
+		}).fail(function(){
+		    eb()
+		})
+	} else {
+		eb()
+	}
+}
+
+ltcrabbit.api2.getappdata = function(apikey, cb, eb)
+{
+	ltcrabbit.api2.eval('getappdata', apikey, 
+		function(data)
+		{	cb(data.getappdata)
 		},
 		eb
 	)

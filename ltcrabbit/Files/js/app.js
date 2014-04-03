@@ -1,6 +1,8 @@
 
 app = window.app = {}
 
+app.version = '1.1.0'
+
 app.hardcoded = {
 	"maxExpirationTime": 30000
 }
@@ -61,7 +63,7 @@ app.config1.valid = function()
 }
 
 app.config2 = {
-	key: 'v2.config.rev.1',
+	key: 'v2.config.rev.2',
 	active: null,
 	inactive: null,
 	schema: { 
@@ -69,15 +71,15 @@ app.config2 = {
 		name: 'Config',
 		description: 'LTCRabbit Monitor Config',
 		properties: {
-			UpdateInterval: { 
-				type: 'integer',
-				label: "Update interval (milliseconds)",
-				required: true 
-			},
 			Pool: {
 				type: 'object',
 				label: "LTCRabbit Public API",
 				properties: {
+					UpdateInterval: { 
+						type: 'integer',
+						label: "Update interval (seconds)",
+						required: true 
+					},
 					Address: { 
 						type: 'string',
 						label: "Address",
@@ -86,7 +88,7 @@ app.config2 = {
 					Workers: {
 						type: "array",
 						label: "Accounts",
-						description: "You can find your <i>User&nbsp;ID</i> and <i>API&nbsp;Key</i> on the <a href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Account&nbsp;Settings</strong></a> page",
+						description: "You can find your <i>API&nbsp;Key</i> on the <a href='javascript: window.open(\"https://www.ltcrabbit.com/#afc17o\")'><strong>Account&nbsp;Settings</strong></a> page",
 						items: {
 							type: "object",    	                
 							properties: {
@@ -98,11 +100,6 @@ app.config2 = {
 									type: 'string', 
 									label: "API Key",
 									required: true 
-								},
-								UserId: { 
-									type: 'integer',
-									label: "User ID",
-									required: true 
 								}
 							} 
 						}
@@ -113,6 +110,11 @@ app.config2 = {
 				type: 'object',
 				label: "CGMiner/BFGMiner API",
 				properties: {
+					UpdateInterval: { 
+						type: 'integer',
+						label: "Update interval (seconds)",
+						required: true 
+					},
 					Proxy: { 
 						type: 'string',
 						label: "Proxy",
@@ -149,18 +151,18 @@ app.config2 = {
 			}
     	},
 	default: {
-		UpdateInterval: 5000,
 		Pool: {
+			UpdateInterval: 30,
 			Address: 'https://www.ltcrabbit.com/index.php',
 			Workers: [
 			    {
 			    	Disabled: false,
-			    	UserId: 0,
 			    	ApiKey: ''
 			    }
 			]
 		},
 		Farm: {
+			UpdateInterval: 3,
 			Proxy: 'http://127.0.0.1:4030/',
 			Miners: [
 			    {
@@ -179,16 +181,14 @@ app.config2 = {
 				console.log("There's no active config")
 				return false
 			}
-			if (!self.active.UpdateInterval) {
-				console.log("Update interval has been corrected")
-				self.active.UpdateInterval = 5000
-			}
 			if (!self.active.Pool.Address) {
 				console.log("There's no pool address")
 				return false
 			}
+			self.active.Pool.UpdateInterval = Math.max(self.active.Pool.UpdateInterval, 30) || 30
+			self.active.Farm.UpdateInterval = Math.max(self.active.Farm.UpdateInterval, 1) || 1
 			self.active.Pool.Workers.forEach(function(v) {
-				if ((!v.UserId) || (!v.ApiKey)) {
+				if (!v.ApiKey) {
 					console.log("Invalid pool account parameters")
 					return false
 				}
@@ -235,8 +235,7 @@ app.config2 = {
 			{			
 				if (!self.active.Pool.Address) {
 					self.active.Pool.Address = ltcrabbit.address									
-				}
-				self.active.UpdateInterval = Math.max(parseInt(self.active.UpdateInterval), 2000).toString()
+				}				
 				
 				ltcrabbit.address = self.active.Pool.Address
 				self.save()
@@ -263,7 +262,6 @@ app.config2 = {
 			wr.ApiKey = conf.apikey
 
 			cf = $.extend({}, self.default)
-			cf.UpdateInterval = conf.interval
 			cf.Pool.Address = conf.url
 			cf.Pool.Workers = new Array(wr)
 			
@@ -290,7 +288,10 @@ app.start = function()
 	var self = this
 	return app.trace('app.start()', function()
 	{	  
-	    Overwolf.games.onGameInFocusChanged = function()
+		ltcrabbit.api2.appname = 'lcrabbit-overwolf'
+		ltcrabbit.api2.appversion = app.version
+			
+		Overwolf.games.onGameInFocusChanged = function()
 	    {
 	        //console.log('Game in focus changed')
 	    }
@@ -329,20 +330,7 @@ app.start = function()
 	})
 }
 
-app.stateForWorker = function(worker)
-{
-	if (!app.states.hasOwnProperty(worker.UserId)) {
-		app.states[worker.UserId] = {
-			state: $.extend({}, app.nullState),
-			workers: [],
-			errCount: 0,
-			firstErrorTime: null
-		}
-	}
-	return app.states[worker.UserId]
-}
-
-app.minerStateInfoObject = function(data)
+app.StateInfoObject = function(data)
 {
 	this.requestTime = null
 	this.responseTime = null
@@ -353,7 +341,7 @@ app.minerStateInfoObject = function(data)
 		if (!this.requestTime)
 			return true
 		now = new Date().getTime()
-		if ((this.responseTime) && ((now - timeout > this.responseTime) || (now - app.hardcoded.maxExpirationTime > this.responseTime)))
+		if ((this.responseTime) && (now - timeout > this.responseTime))
 			return true
 		return false
 	}
@@ -377,15 +365,28 @@ app.minerStateInfoObject = function(data)
 	}
 }
 
+app.stateForWorker = function(worker)
+{
+	if (!app.states.hasOwnProperty(worker.UserId)) {
+		app.states[worker.UserId] = {
+			config: worker,
+			appdata: new app.StateInfoObject({}),
+			errCount: 0,
+			firstErrorTime: null
+		}
+	}
+	return app.states[worker.UserId]
+}
+
 app.getMinerState = function(miner)
 {
 	var id = miner.Address 
 	if (!app.miners.hasOwnProperty(id)) {
 		app.miners[id] = {
 			config: miner,
-			summary: new app.minerStateInfoObject({}),
-			pools: new app.minerStateInfoObject([]),
-			devs: new app.minerStateInfoObject([]),
+			summary: new app.StateInfoObject({}),
+			pools: new app.StateInfoObject([]),
+			devs: new app.StateInfoObject([]),
 			errCount: 0,
 			firstErrorTime: null			
 		}
@@ -433,24 +434,18 @@ app.update = function()
 			var worker = v;
 			if (!worker.Disabled) {
 				var info = app.stateForWorker(worker)
-				ltcrabbit.getuserstatus(worker.ApiKey,
-					function(state)	{
-						info.state = state
-						app.onWorkerUpdatePassed(info)
-					}, 
-					function() {
-						app.onWorkerUpdateFailed(info, null)
-					}				
-				)
-				ltcrabbit.getuserworkers(worker.ApiKey, 
-					function(workers) {						
-						info.workers = workers
-						app.onWorkerUpdatePassed(info)
-					},
-					function()	{						
-						app.onWorkerUpdateFailed(info, null)
-					}
-				)
+				if (info.appdata.isExpired(app.config2.active.Pool.UpdateInterval * 1000)) {
+					info.appdata.onRequest()
+					ltcrabbit.api2.getappdata(worker.ApiKey, 
+						function(data) {
+							info.appdata.onResponse(data)
+							app.onWorkerUpdatePassed(info)					
+						}, function () {
+							info.appdata.onError()
+							app.onWorkerUpdateFailed(info, null)
+						}
+					)						
+				}
 			}
 		})
 		var proxy = app.config2.active.Farm.Proxy
@@ -463,7 +458,7 @@ app.update = function()
 					var minerProxy = proxy;
 					if (miner.Proxy)
 						minerProxy = miner.Proxy
-					if (info.summary.isExpired(app.config2.active.UpdateInterval)) {
+					if (info.summary.isExpired(app.config2.active.Farm.UpdateInterval * 1000)) {
 						info.summary.onRequest()
 						app.cgminerCommand(minerProxy, info, {command: 'summary'}, 
 							function(data) {
@@ -475,19 +470,7 @@ app.update = function()
 							}
 						)						
 					}
-					if (info.pools.isExpired(app.config2.active.UpdateInterval)) {
-						info.pools.onRequest()						
-						app.cgminerCommand(minerProxy, info, {command: 'pools'}, 
-							function(data) {
-								info.pools.onResponse(data.POOLS)
-								app.onMinerUpdatePassed(info)					
-							}, function (reason) {
-								info.pools.onError()
-								app.onMinerUpdateFailed(info, reason)
-							}
-						)
-					}
-					if (info.devs.isExpired(app.config2.active.UpdateInterval)) {
+					if (info.devs.isExpired(app.config2.active.Farm.UpdateInterval * 1000)) {
 						info.devs.onRequest()						
 						app.cgminerCommand(minerProxy, info, {command: 'devs'}, 
 							function(data) {
@@ -499,12 +482,26 @@ app.update = function()
 							}
 						)
 					}
+					/*
+					if (info.pools.isExpired(app.config2.active.Farm.UpdateInterval * 1000)) {
+						info.pools.onRequest()						
+						app.cgminerCommand(minerProxy, info, {command: 'pools'}, 
+							function(data) {
+								info.pools.onResponse(data.POOLS)
+								app.onMinerUpdatePassed(info)					
+							}, function (reason) {
+								info.pools.onError()
+								app.onMinerUpdateFailed(info, reason)
+							}
+						)
+					}
+					*/
 				}
 			})
 		}
 	}
 
-	setTimeout(app.update, app.config2.active.UpdateInterval)
+	setTimeout(app.update, 1000)
 }
 
 app.onWorkerUpdatePassed = function(worker)
@@ -565,17 +562,17 @@ app.onStateChanged = function()
 		for (var k in app.states) {
 			if (app.states.hasOwnProperty(k)) {
 				var info = app.states[k]
-				if ((info.state) && (info.state.username != undefined))
+				if ((info.appdata.data.user) && (info.appdata.data.user.username != undefined))
 				{
-					if (info.workers) {						
+					if (info.appdata.data.worker) {						
 						//console.log(JSON.stringify(info.workers))
-						info.workers.forEach(function(v, i, a) {
+						info.appdata.data.worker.forEach(function(v, i, a) {
 							//console.log(JSON.stringify(v))
-							var userName = v.username
-							if (userName.indexOf(info.state.username + '.') == 0) {
-								a[i].workername = userName.substring(info.state.username.length+1)
+							var userName = v.name
+							if (userName.indexOf(info.appdata.data.user.username + '.') == 0) {
+								a[i].name = userName.substring(info.appdata.data.user.username.length+1)
 							} else {
-								a[i].workername = userName.substring(userName.indexOf('.')+1)
+								a[i].name = userName.substring(userName.indexOf('.')+1)
 							}
 						})
 					}
@@ -658,9 +655,11 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 				if (app.states.hasOwnProperty(k)) {
 					var info = app.states[k]
 				    console.log('Info[' + k + ']: ' + JSON.stringify(info))
-					balance += info.state.balance
-				    hashrate += info.state.hashrate
-				    sharerate += info.state.sharerate
+				    if (info.appdata.data.user) {
+						balance += info.appdata.data.user.balance
+					    hashrate += info.appdata.data.user.hashrate
+					    sharerate += info.appdata.data.user.sharerate
+				    }
 				}
 			}
 			self.fillValue('Balance', balance, 8)
@@ -678,22 +677,22 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 					winfo += '<thead>'
 					winfo += '<tr>'
 					winfo += '<th>'
-					if (info.state && info.state.username) {
-						winfo += info.state.username	
+					if (info.appdata.data.user && info.appdata.data.user.username) {
+						winfo += info.appdata.data.user.username	
 					} else {
 						winfo += 'Workers'
 					}
 					winfo += '</th>'
 					winfo += '</tr>'
 					winfo += '</thead>'
-					if (info.state && info.workers) {			
+					if (info.appdata.data.worker) {			
 						winfo += '<tr>'
 						winfo += '<td>'							
 						winfo += '<div class="device-info">'
 						winfo += '<table>'						
-						info.workers.forEach(function(worker) {
+						info.appdata.data.worker.forEach(function(worker) {
 							winfo += '<tr>'
-							winfo += '<td align="left"><span class="dev-info-alive">' + worker.workername + '</span></td>'
+							winfo += '<td align="left"><span class="dev-info-alive">' + worker.name + '</span></td>'
 							winfo += '<td align="right"><span class="dev-info-alive">' + worker.hashrate.toString() + '</span></td>'
 							winfo += '</tr> '							
 						})
@@ -748,10 +747,10 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 											var cls = 'dev-info-error'
 										}
 										minfo += '<tr>'
-										minfo += '<td><span class="' + cls + '">' + dev['Temperature'] + '&deg;</legend></span></td>'
-										minfo += '<td><span class="' + cls + '">' + dev['Fan Percent'] + '%</span></td>'
-										minfo += '<td><span class="' + cls + '">' + (dev['MHS 5s']*1000).toFixed(0) + '</span></td>'
-										minfo += '<td><span class="' + cls + '">' + dev['Accepted'] + '/' + dev['Rejected'] + '</span></td>'
+										minfo += '<td align="left"><span class="' + cls + '">' + dev['Temperature'] + '&deg;</legend></span></td>'
+										minfo += '<td align="left"><span class="' + cls + '">' + dev['Fan Percent'] + '%</span></td>'
+										minfo += '<td align="right"><span class="' + cls + '">' + (dev['MHS 5s']*1000).toFixed(0) + '</span></td>'
+										minfo += '<td align="right"><span class="' + cls + '">' + dev['Accepted'] + '/' + dev['Rejected'] + '</span></td>'
 										minfo += '</tr> '
 									}
 								})
