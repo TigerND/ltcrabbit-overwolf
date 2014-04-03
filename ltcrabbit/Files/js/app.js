@@ -649,7 +649,8 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 			 */
 			var balance = 0.0,
 			    hashrate = 0,
-			    sharerate = 0.0
+			    sharerate = 0.0,
+			    invalid = 0.0
 			var now = new Date().getTime()
 			for (var k in app.states) {
 				if (app.states.hasOwnProperty(k)) {
@@ -659,12 +660,14 @@ app.layout.vertical = $.extend($.extend({}, app.layout.base), {
 						balance += info.appdata.data.user.balance
 					    hashrate += info.appdata.data.user.hashrate
 					    sharerate += info.appdata.data.user.sharerate
+					    invalid += info.appdata.data.user.invalid_share_rate
 				    }
 				}
 			}
 			self.fillValue('Balance', balance, 8)
 			self.fillValue('Hashrate', hashrate, null)
 			self.fillValue('Sharerate', sharerate, 2)
+			self.fillValue('Invalid', invalid, 2)
 			/**
 			 * Workers
 			 */
