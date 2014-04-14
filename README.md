@@ -5,6 +5,12 @@ LTCRabbit Minitor for Overwolf is meant to monitor LTCRabbit mining pool workers
 Also it provides basic functionality to monitor CGMiner/BFGMiner mining rigs.
 
 
+Contacts
+========
+1. [Issues Tracker](https://github.com/TigerND/ltcrabbit-overwolf/issues)
+2. [BitMessage](bitmsg:BM-NBP1fqdEH5HdkwFi6K7tpBrLk8HdXYXz?action=add&label=ltcrabbit-overwolf)
+
+
 The MIT License (MIT)
 =====================
 
