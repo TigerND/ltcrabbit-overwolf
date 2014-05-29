@@ -8,7 +8,7 @@ Also it provides basic functionality to monitor CGMiner/BFGMiner mining rigs.
 Contacts
 ========
 1. [Issues Tracker](https://github.com/TigerND/ltcrabbit-overwolf/issues)
-2. [BitMessage](bitmsg:BM-NBP1fqdEH5HdkwFi6K7tpBrLk8HdXYXz?action=add&label=ltcrabbit-overwolf)
+2. BitMessage: BM-NBP1fqdEH5HdkwFi6K7tpBrLk8HdXYXz
 
 
 The MIT License (MIT)
